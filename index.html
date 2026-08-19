@@ -678,24 +678,26 @@ function update(dt){
    OBSTACLE
    ========================= */
 
-function spawnObstacle(){
+function spawnObstacle() {
 
-    const lane =
-        Math.floor(Math.random() * 3);
+    const lane = Math.floor(Math.random() * 3);
+
+    const types = [
+        "car",
+        "bus",
+        "truck",
+        "train",
+        "barrier"
+    ];
+
+    const type =
+        types[Math.floor(Math.random() * types.length)];
 
     obstacles.push({
-
         lane: lane,
-
-        z: 1.2,
-
-        type:
-            Math.random() > .5
-            ? "car"
-            : "barrier"
-
+        z: 1.0,
+        type: type
     });
-
 }
 
 
@@ -790,35 +792,23 @@ function checkCoinCollision(c){
    ========================= */
 
 function updateCity(){
-
     let current = cities[0];
 
     for(const city of cities){
-
         if(distance >= city.distance)
             current = city;
-
     }
 
     document.getElementById("city")
         .textContent = current.name;
-
 }
 
-
-/* =========================
-   HUD
-   ========================= */
-
 function updateHUD(){
-
     document.getElementById("coins")
         .textContent = coins;
 
     document.getElementById("distance")
-        .textContent =
-        Math.floor(distance);
-
+        .textContent = Math.floor(distance);
 }
 
 
@@ -1110,103 +1100,145 @@ function project(lane,z){
    DRAW OBJECT
    ========================= */
 
-function drawObject(
-    lane,
-    z,
-    type
-){
+function drawObject(lane, z, type) {
 
-    if(z <= 0)
-        return;
+    if (z <= 0.05) return;
 
-    const p =
-        project(
-            lane,
-            z
+    const p = project(lane, z);
+    const s = p.scale;
+
+    // 🚗 CAR
+    if (type === "car") {
+
+        ctx.fillStyle = "#e53935";
+
+        ctx.fillRect(
+            p.x - 25 * s,
+            p.y - 55 * s,
+            50 * s,
+            55 * s
         );
 
-    const s =
-        p.scale;
+        ctx.fillStyle = "#90caf9";
 
-    if(type === "coin"){
-
-        ctx.fillStyle =
-            "#ffd700";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y - 35 * s,
-            13 * s,
-            0,
-            Math.PI * 2
+        ctx.fillRect(
+            p.x - 17 * s,
+            p.y - 45 * s,
+            34 * s,
+            18 * s
         );
 
-        ctx.fill();
-
-        ctx.strokeStyle =
-            "#fff3a0";
-
-        ctx.lineWidth =
-            3 * s;
-
-        ctx.stroke();
-
         return;
-
     }
 
 
-    if(type === "car"){
+    // 🚌 BUS
+    if (type === "bus") {
 
-        ctx.fillStyle =
-            "#e53935";
-
-        ctx.fillRect(
-            p.x - 25*s,
-            p.y - 45*s,
-            50*s,
-            45*s
-        );
-
-        ctx.fillStyle =
-            "#90caf9";
+        ctx.fillStyle = "#1565c0";
 
         ctx.fillRect(
-            p.x - 16*s,
-            p.y - 38*s,
-            32*s,
-            15*s
+            p.x - 32 * s,
+            p.y - 85 * s,
+            64 * s,
+            85 * s
         );
 
-        return;
+        ctx.fillStyle = "#b3e5fc";
 
-    }
-
-
-    if(type === "barrier"){
-
-        ctx.fillStyle =
-            "#ff9800";
-
-        ctx.fillRect(
-            p.x - 35*s,
-            p.y - 25*s,
-            70*s,
-            25*s
-        );
-
-        ctx.fillStyle =
-            "#fff";
-
-        for(let i=0;i<3;i++){
+        for (let i = 0; i < 3; i++) {
 
             ctx.fillRect(
-                p.x - 30*s + i*22*s,
-                p.y - 22*s,
-                10*s,
-                18*s
+                p.x - 24 * s + i * 17 * s,
+                p.y - 70 * s,
+                12 * s,
+                18 * s
+            );
+
+        }
+
+        return;
+    }
+
+
+    // 🚛 TRUCK
+    if (type === "truck") {
+
+        ctx.fillStyle = "#ff9800";
+
+        ctx.fillRect(
+            p.x - 35 * s,
+            p.y - 70 * s,
+            70 * s,
+            70 * s
+        );
+
+        ctx.fillStyle = "#37474f";
+
+        ctx.fillRect(
+            p.x - 23 * s,
+            p.y - 58 * s,
+            46 * s,
+            22 * s
+        );
+
+        return;
+    }
+
+
+    // 🚆 TRAIN
+    if (type === "train") {
+
+        ctx.fillStyle = "#455a64";
+
+        ctx.fillRect(
+            p.x - 45 * s,
+            p.y - 105 * s,
+            90 * s,
+            105 * s
+        );
+
+        ctx.fillStyle = "#81d4fa";
+
+        ctx.fillRect(
+            p.x - 28 * s,
+            p.y - 82 * s,
+            20 * s,
+            18 * s
+        );
+
+        ctx.fillRect(
+            p.x + 8 * s,
+            p.y - 82 * s,
+            20 * s,
+            18 * s
+        );
+
+        return;
+    }
+
+
+    // 🚧 BARRIER
+    if (type === "barrier") {
+
+        ctx.fillStyle = "#ff6d00";
+
+        ctx.fillRect(
+            p.x - 40 * s,
+            p.y - 30 * s,
+            80 * s,
+            30 * s
+        );
+
+        ctx.fillStyle = "#ffffff";
+
+        for (let i = 0; i < 3; i++) {
+
+            ctx.fillRect(
+                p.x - 30 * s + i * 25 * s,
+                p.y - 23 * s,
+                10 * s,
+                18 * s
             );
 
         }
